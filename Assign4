@@ -1,0 +1,288 @@
+# Python and Pandas Assessment Notebook
+
+import pandas as pd
+import numpy as np
+from functools import reduce
+
+# Task 1: Create a DataFrame using Pandas
+# Create a DataFrame with the following data:
+# Name: Alice, Bob, Charlie, David
+# Age: 25, 30, 35, 28
+# City: New York, San Francisco, Los Angeles, Chicago
+
+try:
+    data = {
+        'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+        'Age': [25, 30, 35, 28],
+        'City': ['New York', 'San Francisco', 'Los Angeles', 'Chicago']
+    }
+    df = pd.DataFrame(data)
+    df['Age'] = df['Age'].astype(int)
+    print('Task 1: DataFrame created successfully')
+    print(df)
+    print('\nData types:')
+    print(df.dtypes)
+except Exception as e:
+    print(f'Task 1 Error: {e}')
+
+
+# Task 2: Row and Column Manipulation
+# Drop the 'City' column from the DataFrame created in Task 1
+
+try:
+    df_no_city = df.drop(columns=['City'])
+    print('\nTask 2: DataFrame after dropping City column')
+    print(df_no_city)
+    print('\nRemaining columns:', list(df_no_city.columns))
+except KeyError:
+    print("Task 2 Error: 'City' column not found.")
+except Exception as e:
+    print(f'Task 2 Error: {e}')
+
+
+# Task 3: Handling Null Values
+# Create a new DataFrame with some null values and fill them
+
+try:
+    df_null = pd.DataFrame({
+        'Name': ['Anna', None, 'Chris', 'Diana'],
+        'Age': [22, np.nan, 29, np.nan],
+        'City': ['Ottawa', 'Toronto', None, 'Montreal']
+    })
+    print('\nTask 3: Original DataFrame with null values')
+    print(df_null)
+
+    # Method 1: Fill null values
+    df_filled = df_null.copy()
+    df_filled['Name'] = df_filled['Name'].fillna('Unknown')
+    df_filled['Age'] = df_filled['Age'].fillna(0)
+    df_filled['City'] = df_filled['City'].fillna('Not Provided')
+    print('\nFilled DataFrame')
+    print(df_filled)
+
+    # Method 2: Drop rows with null values
+    df_dropped = df_null.dropna()
+    print('\nDataFrame after dropping rows with null values')
+    print(df_dropped)
+except Exception as e:
+    print(f'Task 3 Error: {e}')
+
+
+# Task 4: GroupBy and Describe
+# Using the following DataFrame, group by 'Category' and describe the 'Value' column
+
+df_group = pd.DataFrame({
+    'Category': ['A', 'B', 'A', 'B', 'A', 'C'],
+    'Value': [10, 20, 15, 25, 30, 35]
+})
+
+try:
+    group_description = df_group.groupby('Category')['Value'].describe()
+    print('\nTask 4: GroupBy and describe result')
+    print(group_description)
+    print('\nInterpretation:')
+    print('Category A has 3 values with an average of 18.33.')
+    print('Category B has 2 values with an average of 22.5.')
+    print('Category C has 1 value, so its mean is 35.')
+except KeyError as e:
+    print(f'Task 4 Error: Missing column - {e}')
+except Exception as e:
+    print(f'Task 4 Error: {e}')
+
+
+# Task 5: Concatenation and Merging
+# Concatenate two DataFrames vertically and merge them horizontally
+
+df1 = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+df2 = pd.DataFrame({'A': [5, 6], 'B': [7, 8]})
+df3 = pd.DataFrame({'C': [9, 10], 'D': [11, 12]})
+
+try:
+    concatenated_df = pd.concat([df1, df2], axis=0, ignore_index=True)
+    merged_df = pd.concat([df1, df3], axis=1)
+    print('\nTask 5: Vertically concatenated DataFrame')
+    print(concatenated_df)
+    print('Shape:', concatenated_df.shape)
+    print('\nHorizontally merged DataFrame')
+    print(merged_df)
+    print('Shape:', merged_df.shape)
+except Exception as e:
+    print(f'Task 5 Error: {e}')
+
+
+# Task 6: Tuples and Sets
+# Create a tuple of fruits and a set of numbers.
+# Then, try to add an element to each and observe the difference.
+
+try:
+    fruits = ('apple', 'banana', 'orange')
+    numbers_set = {1, 2, 3, 4, 5}
+    print('\nTask 6: Original tuple:', fruits)
+    print('Original set:', numbers_set)
+
+    try:
+        fruits.append('mango')
+    except AttributeError as e:
+        print('Tuple update error:', e)
+
+    numbers_set.add(6)
+    print('Updated set after adding 6:', numbers_set)
+    print('Explanation: tuples are immutable, but sets are mutable.')
+except Exception as e:
+    print(f'Task 6 Error: {e}')
+
+
+# Task 7: Dictionaries
+# Create a dictionary of student names and their scores.
+# Then, update a student's score and add a new student.
+
+try:
+    student_scores = {'John': 78, 'Mary': 85, 'Sam': 90}
+    print('\nTask 7: Original dictionary')
+    print(student_scores)
+
+    student_scores['Mary'] = 88
+    student_scores['Lisa'] = 92
+    print('Updated dictionary')
+    print(student_scores)
+except Exception as e:
+    print(f'Task 7 Error: {e}')
+
+
+# Task 8: Functions and Lambda
+# Create a function to calculate the square of a number.
+# Then, use a lambda function to do the same.
+
+try:
+    def square_number(x):
+        return x ** 2
+
+    square_lambda = lambda x: x ** 2
+
+    print('\nTask 8: Function and lambda results')
+    for value in [4, 7]:
+        print(f'Regular function square of {value}:', square_number(value))
+        print(f'Lambda function square of {value}:', square_lambda(value))
+except Exception as e:
+    print(f'Task 8 Error: {e}')
+
+
+# Task 9: Iterators and Generators
+# Create an iterator for the first 5 even numbers.
+# Then, create a generator for the same.
+
+try:
+    class EvenIterator:
+        def __init__(self, limit=5):
+            self.limit = limit
+            self.count = 0
+            self.current = 0
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            if self.count >= self.limit:
+                raise StopIteration
+            value = self.current
+            self.current += 2
+            self.count += 1
+            return value
+
+    def even_generator(limit=5):
+        for i in range(limit):
+            yield i * 2
+
+    print('\nTask 9: Iterator output')
+    for num in EvenIterator():
+        print(num, end=' ')
+
+    print('\nGenerator output')
+    for num in even_generator():
+        print(num, end=' ')
+    print()
+except Exception as e:
+    print(f'Task 9 Error: {e}')
+
+
+# Task 10: Map, Reduce, and Filter
+# Use map to square all numbers in a list.
+# Use reduce to find the product of all numbers in a list.
+# Use filter to get only even numbers from a list.
+
+numbers = [1, 2, 3, 4, 5]
+
+try:
+    squared_numbers = list(map(lambda x: x ** 2, numbers))
+    product_numbers = reduce(lambda x, y: x * y, numbers)
+    even_numbers = list(filter(lambda x: x % 2 == 0, numbers))
+
+    print('\nTask 10: Map, Reduce, and Filter results')
+    print('Squared numbers:', squared_numbers)
+    print('Product of numbers:', product_numbers)
+    print('Even numbers:', even_numbers)
+except TypeError as e:
+    print(f'Task 10 Error: {e}')
+except Exception as e:
+    print(f'Task 10 Error: {e}')
+
+
+# Task 11: Object-Oriented Programming - Creating a Class
+# Create a class called 'Rectangle' with attributes 'length' and 'width'.
+# Include methods to calculate area and perimeter.
+
+try:
+    class Rectangle:
+        def __init__(self, length, width):
+            if length <= 0 or width <= 0:
+                raise ValueError('Length and width must be positive numbers.')
+            self.length = length
+            self.width = width
+
+        def area(self):
+            return self.length * self.width
+
+        def perimeter(self):
+            return 2 * (self.length + self.width)
+
+    rectangle1 = Rectangle(5, 3)
+    rectangle2 = Rectangle(8, 4)
+
+    print('\nTask 11: Rectangle objects')
+    print('Rectangle 1 area:', rectangle1.area())
+    print('Rectangle 1 perimeter:', rectangle1.perimeter())
+    print('Rectangle 2 area:', rectangle2.area())
+    print('Rectangle 2 perimeter:', rectangle2.perimeter())
+except ValueError as e:
+    print(f'Task 11 Error: {e}')
+except Exception as e:
+    print(f'Task 11 Error: {e}')
+
+
+# Task 12: Pandas Data Analysis
+# Using the following DataFrame, perform these tasks:
+# 1. Find the average salary by department
+# 2. Get the names of employees with salary > 60000
+# 3. Add a new column 'Bonus' which is 10% of salary
+
+df_employees = pd.DataFrame({
+    'Name': ['John', 'Jane', 'Bob', 'Alice', 'Charlie'],
+    'Department': ['IT', 'HR', 'IT', 'Finance', 'HR'],
+    'Salary': [55000, 65000, 70000, 60000, 58000]
+})
+
+try:
+    avg_salary = df_employees.groupby('Department')['Salary'].mean()
+    high_salary_names = df_employees[df_employees['Salary'] > 60000]['Name']
+    df_employees['Bonus'] = df_employees['Salary'] * 0.10
+
+    print('\nTask 12: Average salary by department')
+    print(avg_salary)
+    print('\nEmployees with salary greater than 60000:')
+    print(list(high_salary_names))
+    print('\nEmployee DataFrame with Bonus column')
+    print(df_employees)
+except KeyError as e:
+    print(f'Task 12 Error: Missing column - {e}')
+except Exception as e:
+    print(f'Task 12 Error: {e}')
