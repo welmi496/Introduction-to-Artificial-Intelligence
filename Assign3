@@ -1,0 +1,161 @@
+# Python Library Management System
+
+import pickle
+import sqlite3
+import requests
+
+# 1. Data Types and Variables
+book_title = "Python Programming"
+book_quantity = 5
+book_price = 29.99
+is_available = True
+
+print(f"Book: {book_title}, Quantity: {book_quantity}, Price: ${book_price}, Available: {is_available}")
+
+# 2. Lists
+books = ["Python Basics", "Advanced Python", "Data Science with Python"]
+
+# Add two more books to the list
+books.append("Machine Learning Essentials")
+books.insert(1, "SQL for Beginners")
+
+print("Updated book list:", books)
+
+# 3. Loops and range()
+print("\nAvailable books:")
+for i in range(len(books)):
+    print(f"{i}: {books[i]}")
+
+# 4. User Input
+# Safe default so the notebook runs during export without stopping for input.
+new_book = "Clean Code"
+print(f"Enter a new book title: {new_book}")
+books.append(new_book)
+print("Updated book list:", books)
+
+# 5. Functions and Conditional Statements
+def check_availability(book_name):
+    if not isinstance(book_name, str) or not book_name.strip():
+        return False
+    if book_name.strip() in books:
+        return True
+    else:
+        return False
+
+# Test the function
+print(f"Is 'Python Basics' available? {check_availability('Python Basics')}")
+print(f"Is 'Unknown Book' available? {check_availability('Unknown Book')}")
+
+# 6. File I/O
+def save_books_to_file(filename):
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            for book in books:
+                f.write(f"{book}\n")
+        return True
+    except OSError as e:
+        print(f"Error saving books to file: {e}")
+        return False
+
+def read_books_from_file(filename):
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            return [line.strip() for line in f if line.strip()]
+    except FileNotFoundError:
+        print(f"File not found: {filename}")
+        return []
+    except OSError as e:
+        print(f"Error reading file: {e}")
+        return []
+
+# Test file I/O
+if save_books_to_file("books.txt"):
+    !cat books.txt
+print("Books read from file:", read_books_from_file("books.txt"))
+
+# 7. Pickle for serialization
+def save_books_pickle(filename):
+    try:
+        with open(filename, 'wb') as f:
+            pickle.dump(books, f)
+        return True
+    except (OSError, pickle.PickleError) as e:
+        print(f"Error saving pickle file: {e}")
+        return False
+
+def load_books_pickle(filename):
+    try:
+        with open(filename, 'rb') as f:
+            data = pickle.load(f)
+        if isinstance(data, list):
+            return data
+        print("Pickle file does not contain a valid book list.")
+        return []
+    except FileNotFoundError:
+        print(f"Pickle file not found: {filename}")
+        return []
+    except (OSError, pickle.PickleError, EOFError) as e:
+        print(f"Error loading pickle file: {e}")
+        return []
+
+# Test pickle functions
+if save_books_pickle("books.pkl"):
+    print("Books loaded from pickle:", load_books_pickle("books.pkl"))
+
+# 8. SQLite Database Interaction
+def create_books_table():
+    conn = sqlite3.connect('library.db')
+    cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS books
+                      (id INTEGER PRIMARY KEY, title TEXT, quantity INTEGER)""")
+    conn.commit()
+    conn.close()
+
+def add_book_to_db(title, quantity):
+    if not isinstance(title, str) or not title.strip():
+        print("Invalid title.")
+        return False
+    if not isinstance(quantity, int) or quantity < 0:
+        print("Quantity must be a non-negative integer.")
+        return False
+    try:
+        conn = sqlite3.connect('library.db')
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO books (title, quantity) VALUES (?, ?)", (title.strip(), quantity))
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+        return False
+
+# Test database functions
+create_books_table()
+print("Book added to database:", add_book_to_db("Python for Beginners", 10))
+
+try:
+    conn = sqlite3.connect('library.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM books")
+    print("Database records:", cursor.fetchall())
+    conn.close()
+except sqlite3.Error as e:
+    print(f"Database read error: {e}")
+
+# 9. Web API Interaction (GitHub API)
+def get_python_repos():
+    url = "https://api.github.com/search/repositories"
+    params = {"q": "language:python", "sort": "stars", "order": "desc"}
+    try:
+        response = requests.get(url, params=params, timeout=20)
+        response.raise_for_status()
+        data = response.json()
+        return [repo['name'] for repo in data.get('items', [])[:5]]
+    except requests.RequestException as e:
+        print(f"API request error: {e}")
+        return []
+
+# Test API function
+print("Top 5 Python repositories on GitHub:", get_python_repos())
+
+print("\nLibrary Management System operations completed.")
