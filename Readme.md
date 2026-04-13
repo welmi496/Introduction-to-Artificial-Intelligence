@@ -22,13 +22,6 @@ The dataset used is the IMDb dataset from the Hugging Face `datasets` library.
 - Confusion matrices, ROC curves, and embedding visualization
 - Report summary for PDF submission
 
-## How to Run
-1. Open the notebook in Google Colab.
-2. Run the installation cell to install required libraries.
-3. Run all notebook cells from top to bottom.
-4. Review generated charts, metrics, and report text.
-5. Export the notebook as PDF or create a separate PDF report.
-
 ## Output
 The notebook produces:
 - cleaned text data
